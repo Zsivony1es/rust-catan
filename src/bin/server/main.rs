@@ -15,7 +15,12 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use axum::{Json, Router, extract::State, http::StatusCode, routing::{get, post}};
+use axum::{
+    extract::State,
+    http::StatusCode,
+    routing::{get, post},
+    Json, Router,
+};
 use serde::{Deserialize, Serialize};
 use tower_http::trace::TraceLayer;
 use tracing::info;
@@ -69,7 +74,10 @@ async fn join(
         color = ?req.color,
         "POST /join called"
     );
-    let mut session = state.session.lock().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let mut session = state
+        .session
+        .lock()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     // Avoid duplicate colors for now.
     if !session.players.iter().any(|p| p.color == req.color) {
         session.players.push(Player::new(req.color));
@@ -121,7 +129,5 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(addr)
         .await
         .expect("failed to bind server address");
-    axum::serve(listener, app)
-        .await
-        .expect("server error");
+    axum::serve(listener, app).await.expect("server error");
 }
