@@ -31,7 +31,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let http = reqwest::Client::new();
 
     let health_url = format!("{base_url}/health");
-    let health: serde_json::Value = http.get(&health_url).send().await?.error_for_status()?.json().await?;
+    let health: serde_json::Value = http
+        .get(&health_url)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
     println!("GET {health_url} -> {health}");
 
     let join_url = format!("{base_url}/join");
@@ -46,8 +52,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("POST {join_url} {{\"color\": \"{color}\"}} -> {joined:?}");
 
     let state_url = format!("{base_url}/state");
-    let state: GameSession = http.get(&state_url).send().await?.error_for_status()?.json().await?;
-    println!("GET {state_url} -> turn={} players={:?}", state.turn, state.players);
+    let state: GameSession = http
+        .get(&state_url)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    println!(
+        "GET {state_url} -> turn={} players={:?}",
+        state.turn, state.players
+    );
 
     Ok(())
 }
