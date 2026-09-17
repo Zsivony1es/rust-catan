@@ -4,6 +4,15 @@ use serde::{Deserialize, Serialize};
 pub enum PlayerColor {
     Red,
     Blue,
-    Gray,
     Orange,
+    White,
+}
+
+impl PlayerColor {
+    pub const ALL: [PlayerColor; 4] = [
+        PlayerColor::Red,
+        PlayerColor::Blue,
+        PlayerColor::Orange,
+        PlayerColor::White,
+    ];
 }

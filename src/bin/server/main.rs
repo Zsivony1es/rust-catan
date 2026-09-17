@@ -3,92 +3,27 @@
 //! Run with:
 //! ```sh
 //! cargo run --bin server
-//! # optional: SERVER_ADDR=127.0.0.1:3000 cargo run --bin server
+//! # optional: SERVER_ADDR=127.0.0.1:3000 SERVER_SEED=42 cargo run --bin server
 //! ```
-//! Endpoints:
-//! - `GET /health` -> `{ "status": "ok" }`
-//! - `GET /state`  -> current `GameSession` as JSON
-//! - `POST /join` with `{ "color": "Red" }` -> joins game, returns updated `GameSession`
+//! Full v1 contract: `POST /games`, `GET /games/:id/state`, join/start,
+//! setup, roll, discard, robber, build, trade, dev play, end-turn.
+//! Legacy aliases `GET /state` and `POST /join` target the `default` game.
 
-use std::{
-    net::SocketAddr,
-    sync::{Arc, Mutex},
-};
+use std::net::SocketAddr;
 
-use axum::{
-    extract::State,
-    http::StatusCode,
-    routing::{get, post},
-    Json, Router,
-};
-use serde::{Deserialize, Serialize};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 use tracing_subscriber::prelude::*;
 
-use rust_catan::{GameSession, Player, PlayerColor};
-
-#[derive(Clone)]
-struct AppState {
-    session: Arc<Mutex<GameSession>>,
-}
-
-#[derive(Debug, Deserialize)]
-struct JoinRequest {
-    color: PlayerColor,
-}
-
-#[derive(Debug, Serialize)]
-struct Health {
-    status: &'static str,
-}
-
-async fn health() -> Json<Health> {
-    // Single macro -> console (fmt layer) + Sentry (sentry tracing layer).
-    // Fields become Sentry log attributes, queryable in the Logs explorer.
-    info!(
-        endpoint.method = "GET",
-        endpoint.route = "/health",
-        "GET /health called"
-    );
-    Json(Health { status: "ok" })
-}
-
-async fn get_state(State(state): State<AppState>) -> Json<GameSession> {
-    info!(
-        endpoint.method = "GET",
-        endpoint.route = "/state",
-        "GET /state called"
-    );
-    let session = state.session.lock().expect("session lock").clone();
-    Json(session)
-}
-
-async fn join(
-    State(state): State<AppState>,
-    Json(req): Json<JoinRequest>,
-) -> Result<Json<GameSession>, StatusCode> {
-    info!(
-        endpoint.method = "POST",
-        endpoint.route = "/join",
-        color = ?req.color,
-        "POST /join called"
-    );
-    let mut session = state
-        .session
-        .lock()
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    // Avoid duplicate colors for now.
-    if !session.players.iter().any(|p| p.color == req.color) {
-        session.players.push(Player::new(req.color));
-        session.turn += 1;
-    }
-    Ok(Json(session.clone()))
-}
+use rust_catan::server::{router, AppState};
 
 fn init_sentry() -> sentry::ClientInitGuard {
+    let dsn = std::env::var("SENTRY_DSN").unwrap_or_else(|_| {
+        "https://547bc132aefdf46bec7eeff82cfa026e@o4512078782136320.ingest.de.sentry.io/4512078786723920"
+            .into()
+    });
     sentry::init((
-        "https://547bc132aefdf46bec7eeff82cfa026e@o4512078782136320.ingest.de.sentry.io/4512078786723920",
+        dsn,
         sentry::ClientOptions::new()
             .maybe_release(sentry::release_name!())
             .send_default_pii(true),
@@ -112,16 +47,8 @@ async fn main() {
         .and_then(|s| s.parse().ok())
         .unwrap_or_else(|| SocketAddr::from(([127, 0, 0, 1], 3000)));
 
-    let state = AppState {
-        session: Arc::new(Mutex::new(GameSession::new())),
-    };
-
-    let app: Router = Router::new()
-        .route("/health", get(health))
-        .route("/state", get(get_state))
-        .route("/join", post(join))
-        .layer(TraceLayer::new_for_http())
-        .with_state(state);
+    let state = AppState::new();
+    let app = router(state).layer(TraceLayer::new_for_http());
 
     info!("Catan server listening on {addr}");
     println!("Catan server listening on http://{addr}");
