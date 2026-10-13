@@ -5,7 +5,7 @@ Guidance for AI / human contributors working in this repo.
 ## Rules source
 
 - Game rules summary: [`docs/RULES.md`](docs/RULES.md)
-- Authoritative rules PDF: [`res/catan-rulebook.pdf`](res/catan-rulebook.pdf) — if it conflicts with `docs/RULES.md`, the PDF wins.
+- Authoritative rules PDF: [CATAN 6th ed, CN3081, v6.250401](https://www.catan.com/sites/default/files/2025-03/CN3081%20CATAN%E2%80%93The%20Game%20Rulebook%20secure%20%281%29.pdf) (not vendored) — if it conflicts with `docs/RULES.md`, the PDF wins.
 - Implementation plan (server-focused): [`PLAN.md`](PLAN.md)
 
 Read `docs/RULES.md` before changing game logic, board model, costs, trading, robber, dev cards, scoring, or win conditions.

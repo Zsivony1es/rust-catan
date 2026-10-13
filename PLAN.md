@@ -1,6 +1,6 @@
 # Rust-Catan Implementation Plan (Server-Focused)
 
-Source of truth for rules: `res/catan-rulebook.pdf` (CATAN 6th ed, CN3081, v6.250401).
+Source of truth for rules: the official [CATAN 6th ed, CN3081, v6.250401 rulebook](https://www.catan.com/sites/default/files/2025-03/CN3081%20CATAN%E2%80%93The%20Game%20Rulebook%20secure%20%281%29.pdf).
 Current code audited: `src/lib.rs`, `src/game_session.rs`, `src/model/*`, `src/bin/server/main.rs`, `src/bin/client/main.rs`, `Cargo.toml`.
 
 Goal: make `cargo run --bin server` + `cargo run --bin client` play a legal, complete game of Catan to 10 VPs. Server is authoritative; client(s) are thin + AI loop that polls/acts via HTTP.

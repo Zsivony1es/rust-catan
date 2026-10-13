@@ -1,7 +1,7 @@
 # Catan Rules Summary
 
 Source: [CATAN 6th Edition, CN3081, v6.250401](https://www.catan.com/sites/default/files/2025-03/CN3081%20CATAN%E2%80%93The%20Game%20Rulebook%20secure%20%281%29.pdf).
-The downloaded PDF is located in [`res/catan-rulebook.pdf`](res/catan-rulebook.pdf).
+The PDF is not vendored in this repository; download it from the link above if you need it.
 This is an implementation-oriented summary for `rust-catan`. If this file and the PDF disagree, the PDF wins.
 
 ## Objective

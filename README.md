@@ -2,7 +2,7 @@
 
 This repository contains an implementation of the game Catan in Rust and a Player AI, which tries to play the game as optimally as possible.
 
-Rules reference: [`docs/RULES.md`](docs/RULES.md) (summary) and [`res/catan-rulebook.pdf`](res/catan-rulebook.pdf) (authoritative). Implementation plan: [`PLAN.md`](PLAN.md).
+Rules reference: [`docs/RULES.md`](docs/RULES.md) (summary) and the official [CATAN 6th ed. rulebook](https://www.catan.com/sites/default/files/2025-03/CN3081%20CATAN%E2%80%93The%20Game%20Rulebook%20secure%20%281%29.pdf) (authoritative). Implementation plan: [`PLAN.md`](PLAN.md).
 
 # Included Crates
 
